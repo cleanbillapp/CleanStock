@@ -350,7 +350,13 @@ export default function Home() {
                 <li>売上高: {latestStatement.Sales}</li>
                 <li>営業利益: {latestStatement.OP}</li>
                 <li>純利益: {latestStatement.NP}</li>
-                <li>EPS: {latestStatement.EPS}</li>
+                                <li>EPS: {latestStatement.EPS}</li>
+                {latestQuote?.C && latestStatement?.EPS && Number(latestStatement.EPS) > 0 ? (
+                  <li>
+                    PER: {(latestQuote.C / Number(latestStatement.EPS)).toFixed(2)}倍
+                  </li>
+                ) : null}
+
               </ul>
             ) : (
               <p>財務データがありません</p>
