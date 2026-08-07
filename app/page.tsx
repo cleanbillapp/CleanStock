@@ -118,11 +118,12 @@ export default function Home() {
 
             {latestStatement ? (
               <ul style={{ listStyle: "none", padding: 0, margin: 0, lineHeight: 1.8 }}>
-                                <li>開示日: {latestStatement.DisclosedDate}</li>
-                <li>売上高: {latestStatement.NetSales}</li>
-                <li>営業利益: {latestStatement.OperatingProfit}</li>
-                <li>純利益: {latestStatement.Profit}</li>
+                                                <li>開示日: {latestStatement.DiscDate}</li>
+                <li>売上高: {latestStatement.Sales}</li>
+                <li>営業利益: {latestStatement.OP}</li>
+                <li>純利益: {latestStatement.NP}</li>
                 <li>EPS: {latestStatement.EPS}</li>
+
 
               </ul>
             ) : (
