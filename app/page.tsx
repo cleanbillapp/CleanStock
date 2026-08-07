@@ -449,7 +449,7 @@ return (
                     %
                   </li>
                 ) : null}
-                {latestQuote?.C &&
+                                {latestQuote?.C &&
                 latestStatement?.FEPS &&
                 Number(latestStatement.FEPS) > 0 ? (
                   <li>
@@ -458,17 +458,30 @@ return (
                     倍
                   </li>
                 ) : null}
-</li>
-                ) : null}
-
-
               </ul>
             ) : (
               <p>財務データがありません</p>
             )}
+            {code && (
+              <a
+                href={`https://finance.yahoo.co.jp/quote/${code}.T/financials`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: "inline-block",
+                  marginTop: 12,
+                  color: "#58a6ff",
+                  fontSize: 14,
+                  textDecoration: "none",
+                }}
+              >
+                決算短信・詳細な決算情報を見る →
+              </a>
+            )}
           </section>
-                </div>
+        </div>
       )}
+
 
       {/* 複数銘柄の一覧表示 */}
       <h2 style={{ fontSize: 16, margin: "32px 0 8px", color: "#8b949e" }}>
