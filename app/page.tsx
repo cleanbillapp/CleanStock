@@ -197,7 +197,15 @@ export default function Home() {
   }
 return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "24px 16px" }}>
-      <h1 style={{ fontSize: 22, marginBottom: 16 }}>CleanStock</h1>
+            <h1 style={{ fontSize: 22, marginBottom: 4 }}>CleanStock</h1>
+      <a
+        href="/glossary"
+        style={{ color: "#58a6ff", fontSize: 13, textDecoration: "none" }}
+      >
+        指標の見方はこちら →
+      </a>
+      <div style={{ marginBottom: 16 }} />
+
 
       {/* お気に入り一覧 */}
       <h2 style={{ fontSize: 16, marginBottom: 8, color: "#8b949e" }}>
