@@ -316,18 +316,22 @@ export default function Home() {
               </button>
             </div>
 
-            {latestQuote ? (
-              <ul style={{ listStyle: "none", padding: 0, margin: "8px 0 0", lineHeight: 1.8 }}>
-                <li>日付: {latestQuote.Date}</li>
-                <li>終値: {latestQuote.C}</li>
-                <li>始値: {latestQuote.O}</li>
-                <li>高値: {latestQuote.H}</li>
-                <li>安値: {latestQuote.L}</li>
-                <li>出来高: {latestQuote.Vo}</li>
-              </ul>
+                        {latestQuote ? (
+              <>
+                <ul style={{ listStyle: "none", padding: 0, margin: "8px 0 0", lineHeight: 1.8 }}>
+                  <li>日付: {latestQuote.Date}</li>
+                  <li>終値: {latestQuote.C}</li>
+                  <li>始値: {latestQuote.O}</li>
+                  <li>高値: {latestQuote.H}</li>
+                  <li>安値: {latestQuote.L}</li>
+                  <li>出来高: {latestQuote.Vo}</li>
+                </ul>
+                <PriceChart quotes={quotesList} />
+              </>
             ) : (
               <p>株価データがありません</p>
             )}
+
           </section>
 
           <section
