@@ -16,6 +16,54 @@ type ListItem = {
 
 const FAVORITES_KEY = "cleanstock_favorites";
 
+type Quote = { Date: string; C: number };
+
+function PriceChart({ quotes }: { quotes: Quote[] }) {
+  if (quotes.length < 2) return null;
+
+  const width = 400;
+  const height = 120;
+  const padding = 8;
+
+  const closes = quotes.map((q) => q.C);
+  const min = Math.min(...closes);
+  const max = Math.max(...closes);
+  const range = max - min || 1;
+
+  const points = quotes.map((q, i) => {
+    const x = padding + (i / (quotes.length - 1)) * (width - padding * 2);
+    const y =
+      height - padding - ((q.C - min) / range) * (height - padding * 2);
+    return `${x},${y}`;
+  });
+
+  const isUp = closes[closes.length - 1] >= closes[0];
+
+  return (
+    <div style={{ marginTop: 12 }}>
+      <svg width="100%" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
+        <polyline
+          points={points.join(" ")}
+          fill="none"
+          stroke={isUp ? "#3fb950" : "#f85149"}
+          strokeWidth={2}
+        />
+      </svg>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          fontSize: 12,
+          color: "#8b949e",
+          marginTop: 4,
+        }}
+      >
+        <span>{quotes[0].Date}</span>
+        <span>{quotes[quotes.length - 1].Date}</span>
+      </div>
+    </div>
+  );
+}
 function loadFavorites(): string[] {
   if (typeof window === "undefined") return [];
   try {
