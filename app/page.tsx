@@ -166,7 +166,36 @@ export default function Home() {
 
   const isFavorite = code && favorites.includes(code);
 
-  return (
+    // --- 複数銘柄の一覧表示 ---
+  const [codesInput, setCodesInput] = useState("");
+  const [listLoading, setListLoading] = useState(false);
+  const [listError, setListError] = useState<string | null>(null);
+  const [listResults, setListResults] = useState<ListItem[] | null>(null);
+
+  async function handleListSearch() {
+    if (!codesInput) return;
+    setListLoading(true);
+    setListError(null);
+    setListResults(null);
+
+    try {
+      const res = await fetch(
+        `/api/stocks?codes=${encodeURIComponent(codesInput)}`
+      );
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "取得に失敗しました");
+      }
+
+      setListResults(data.results);
+    } catch (err: any) {
+      setListError(err.message);
+    } finally {
+      setListLoading(false);
+    }
+  }
+return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "24px 16px" }}>
       <h1 style={{ fontSize: 22, marginBottom: 16 }}>CleanStock</h1>
 
