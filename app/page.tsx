@@ -1,12 +1,89 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+type ListItem = {
+  code: string;
+  companyName: string | null;
+  date: string | null;
+  close: number | null;
+  open: number | null;
+  high: number | null;
+  low: number | null;
+  volume: number | null;
+  error: string | null;
+};
+
+const FAVORITES_KEY = "cleanstock_favorites";
+
+function loadFavorites(): string[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(FAVORITES_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveFavorites(favorites: string[]) {
+  window.localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
+}
 
 export default function Home() {
+  // --- 単一銘柄検索(詳細表示) ---
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<any>(null);
+
+  // --- お気に入り ---
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [favData, setFavData] = useState<ListItem[] | null>(null);
+  const [favLoading, setFavLoading] = useState(false);
+  const [favError, setFavError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setFavorites(loadFavorites());
+  }, []);
+
+  async function loadFavoriteQuotes(codes: string[]) {
+    if (codes.length === 0) {
+      setFavData([]);
+      return;
+    }
+    setFavLoading(true);
+    setFavError(null);
+    try {
+      const res = await fetch(
+        `/api/stocks?codes=${encodeURIComponent(codes.join(","))}`
+      );
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "取得に失敗しました");
+      setFavData(data.results);
+    } catch (err: any) {
+      setFavError(err.message);
+    } finally {
+      setFavLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (favorites.length > 0) {
+      loadFavoriteQuotes(favorites);
+    } else {
+      setFavData([]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [favorites]);
+
+  function toggleFavorite(targetCode: string) {
+    const next = favorites.includes(targetCode)
+      ? favorites.filter((c) => c !== targetCode)
+      : [...favorites, targetCode];
+    setFavorites(next);
+    saveFavorites(next);
+  }
 
   async function handleSearch() {
     if (!code) return;
@@ -39,11 +116,90 @@ export default function Home() {
   const statementsList = result?.statements?.data ?? [];
   const latestStatement = statementsList[0];
 
+  const isFavorite = code && favorites.includes(code);
+
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "24px 16px" }}>
       <h1 style={{ fontSize: 22, marginBottom: 16 }}>CleanStock</h1>
 
-      <div style={{ display: "flex", gap: 8, marginBottom: 24 }}>
+      {/* お気に入り一覧 */}
+      <h2 style={{ fontSize: 16, marginBottom: 8, color: "#8b949e" }}>
+        お気に入り
+      </h2>
+
+      {favLoading && <p style={{ color: "#8b949e" }}>読み込み中...</p>}
+      {favError && <p style={{ color: "#f85149" }}>{favError}</p>}
+
+      {favorites.length === 0 && !favLoading ? (
+        <p style={{ color: "#8b949e", marginBottom: 24 }}>
+          まだお気に入りがありません。下の検索から銘柄を検索して★で登録できます。
+        </p>
+      ) : (
+        <div
+          style={{
+            background: "#161b22",
+            border: "1px solid #30363d",
+            borderRadius: 12,
+            overflow: "hidden",
+            marginBottom: 24,
+          }}
+        >
+          {(favData ?? []).map((item, i) => (
+            <div
+              key={item.code}
+              style={{
+                padding: 16,
+                borderTop: i === 0 ? "none" : "1px solid #30363d",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "flex-start",
+              }}
+            >
+              <div>
+                <div style={{ fontWeight: "bold", marginBottom: 4 }}>
+                  {item.companyName ?? item.code}
+                  <span style={{ color: "#8b949e", fontWeight: "normal" }}>
+                    {" "}
+                    ({item.code})
+                  </span>
+                </div>
+                {item.error ? (
+                  <p style={{ color: "#f85149", margin: 0 }}>{item.error}</p>
+                ) : item.close ? (
+                  <div style={{ display: "flex", gap: 12, flexWrap: "wrap", fontSize: 14 }}>
+                    <span>終値: {item.close}</span>
+                    <span>始値: {item.open}</span>
+                    <span>高値: {item.high}</span>
+                    <span>安値: {item.low}</span>
+                  </div>
+                ) : (
+                  <p style={{ color: "#8b949e", margin: 0 }}>データなし</p>
+                )}
+              </div>
+              <button
+                onClick={() => toggleFavorite(item.code)}
+                aria-label="お気に入り解除"
+                style={{
+                  background: "none",
+                  border: "none",
+                  fontSize: 22,
+                  color: "#e3b341",
+                  cursor: "pointer",
+                  lineHeight: 1,
+                }}
+              >
+                ★
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* 単一銘柄検索 */}
+      <h2 style={{ fontSize: 16, marginBottom: 8, color: "#8b949e" }}>
+        銘柄検索
+      </h2>
+      <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
         <input
           value={code}
           onChange={(e) => setCode(e.target.value)}
@@ -74,9 +230,7 @@ export default function Home() {
         </button>
       </div>
 
-      {error && (
-        <p style={{ color: "#f85149", marginBottom: 16 }}>{error}</p>
-      )}
+      {error && <p style={{ color: "#f85149", marginBottom: 16 }}>{error}</p>}
 
       {result && (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -88,12 +242,34 @@ export default function Home() {
               padding: 16,
             }}
           >
-            <h2 style={{ fontSize: 18, marginTop: 0 }}>
-              {companyName ?? code}
-            </h2>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <h3 style={{ fontSize: 18, margin: 0 }}>
+                {companyName ?? code}
+              </h3>
+              <button
+                onClick={() => toggleFavorite(code)}
+                aria-label="お気に入り登録"
+                style={{
+                  background: "none",
+                  border: "none",
+                  fontSize: 22,
+                  color: isFavorite ? "#e3b341" : "#484f58",
+                  cursor: "pointer",
+                  lineHeight: 1,
+                }}
+              >
+                ★
+              </button>
+            </div>
 
             {latestQuote ? (
-              <ul style={{ listStyle: "none", padding: 0, margin: 0, lineHeight: 1.8 }}>
+              <ul style={{ listStyle: "none", padding: 0, margin: "8px 0 0", lineHeight: 1.8 }}>
                 <li>日付: {latestQuote.Date}</li>
                 <li>終値: {latestQuote.C}</li>
                 <li>始値: {latestQuote.O}</li>
@@ -114,17 +290,15 @@ export default function Home() {
               padding: 16,
             }}
           >
-            <h2 style={{ fontSize: 18, marginTop: 0 }}>財務情報(直近開示)</h2>
+            <h3 style={{ fontSize: 18, marginTop: 0 }}>財務情報(直近開示)</h3>
 
             {latestStatement ? (
               <ul style={{ listStyle: "none", padding: 0, margin: 0, lineHeight: 1.8 }}>
-                                                <li>開示日: {latestStatement.DiscDate}</li>
+                <li>開示日: {latestStatement.DiscDate}</li>
                 <li>売上高: {latestStatement.Sales}</li>
                 <li>営業利益: {latestStatement.OP}</li>
                 <li>純利益: {latestStatement.NP}</li>
                 <li>EPS: {latestStatement.EPS}</li>
-
-
               </ul>
             ) : (
               <p>財務データがありません</p>
