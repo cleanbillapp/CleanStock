@@ -405,7 +405,52 @@ return (
                     ROE:{" "}
                     {((Number(latestStatement.NP) / Number(latestStatement.Eq)) * 100).toFixed(2)}
                     %
+                                  {latestStatement?.OP &&
+                latestStatement?.Sales &&
+                Number(latestStatement.Sales) > 0 ? (
+                  <li>
+                    営業利益率:{" "}
+                    {((Number(latestStatement.OP) / Number(latestStatement.Sales)) * 100).toFixed(2)}
+                    %
                   </li>
+                ) : null}
+                {latestStatement?.NP &&
+                latestStatement?.Sales &&
+                Number(latestStatement.Sales) > 0 ? (
+                  <li>
+                    純利益率:{" "}
+                    {((Number(latestStatement.NP) / Number(latestStatement.Sales)) * 100).toFixed(2)}
+                    %
+                  </li>
+                ) : null}
+                {latestStatement?.NP &&
+                latestStatement?.TA &&
+                Number(latestStatement.TA) > 0 ? (
+                  <li>
+                    ROA:{" "}
+                    {((Number(latestStatement.NP) / Number(latestStatement.TA)) * 100).toFixed(2)}
+                    %
+                  </li>
+                ) : null}
+                {latestStatement?.Eq &&
+                latestStatement?.TA &&
+                Number(latestStatement.TA) > 0 ? (
+                  <li>
+                    自己資本比率:{" "}
+                    {((Number(latestStatement.Eq) / Number(latestStatement.TA)) * 100).toFixed(2)}
+                    %
+                  </li>
+                ) : null}
+                {latestQuote?.C &&
+                latestStatement?.FEPS &&
+                Number(latestStatement.FEPS) > 0 ? (
+                  <li>
+                    予想PER:{" "}
+                    {(latestQuote.C / Number(latestStatement.FEPS)).toFixed(2)}
+                    倍
+                  </li>
+                ) : null}
+</li>
                 ) : null}
 
 
