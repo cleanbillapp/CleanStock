@@ -351,11 +351,34 @@ export default function Home() {
                 <li>営業利益: {latestStatement.OP}</li>
                 <li>純利益: {latestStatement.NP}</li>
                                 <li>EPS: {latestStatement.EPS}</li>
-                {latestQuote?.C && latestStatement?.EPS && Number(latestStatement.EPS) > 0 ? (
+                                {latestQuote?.C && latestStatement?.EPS && Number(latestStatement.EPS) > 0 ? (
                   <li>
                     PER: {(latestQuote.C / Number(latestStatement.EPS)).toFixed(2)}倍
                   </li>
                 ) : null}
+                {latestQuote?.C &&
+                latestStatement?.Eq &&
+                latestStatement?.ShOutFY &&
+                Number(latestStatement.ShOutFY) > 0 ? (
+                  <li>
+                    PBR:{" "}
+                    {(
+                      latestQuote.C /
+                      (Number(latestStatement.Eq) / Number(latestStatement.ShOutFY))
+                    ).toFixed(2)}
+                    倍
+                  </li>
+                ) : null}
+                {latestStatement?.NP &&
+                latestStatement?.Eq &&
+                Number(latestStatement.Eq) > 0 ? (
+                  <li>
+                    ROE:{" "}
+                    {((Number(latestStatement.NP) / Number(latestStatement.Eq)) * 100).toFixed(2)}
+                    %
+                  </li>
+                ) : null}
+
 
               </ul>
             ) : (
