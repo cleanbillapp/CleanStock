@@ -199,7 +199,20 @@ export default function Home() {
 
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "24px 16px" }}>
-      <h1 style={{ fontSize: 22, marginBottom: 4 }}>CleanStock</h1>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+        <h1 style={{ fontSize: 22, margin: 0 }}>CleanStock</h1>
+        <svg
+          viewBox="0 0 130 10"
+          xmlns="http://www.w3.org/2000/svg"
+          preserveAspectRatio="none"
+          style={{ width: 140, height: 7, marginTop: -3 }}
+        >
+          <ellipse cx="65" cy="4.2" rx="8" ry="1.5" fill="#F4B400" />
+          <polygon points="2,5 65,3.6 128,5 65,6.4" fill="#F4B400" />
+        </svg>
+      </div>
+      <div style={{ marginTop: 6 }} />
+
       <a
         href="/glossary"
         style={{ color: "#58a6ff", fontSize: 13, textDecoration: "none" }}
